@@ -1,0 +1,17 @@
+import 'package:http/http.dart' as http;
+import 'dart:io';
+
+Future<Map<String, dynamic>> predictImage(File imageFile) async {
+  var uri = Uri.parse('http://your_flask_server_ip:5000/predict');
+  var request = http.MultipartRequest('POST', uri)
+    ..files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+  var response = await request.send();
+  if (response.statusCode == 200) {
+    var responseData = await response.stream.toBytes();
+    var result = String.fromCharCodes(responseData);
+    return jsonDecode(result);
+  } else {
+    throw Exception('Failed to predict image');
+  }
+}
